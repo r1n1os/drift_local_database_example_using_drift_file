@@ -2,7 +2,7 @@ CREATE TABLE User (
     id INT NOT NULL PRIMARY KEY,
     username TEXT NOT NULL,
     music_style TEXT NOT NULL,
-    favorite_song INT NOT NULL
+    favorite_song_name TEXT NOT NULL
 ) As UserTable;
 
 CREATE TABLE Song (
@@ -21,6 +21,7 @@ CREATE TABLE Artist (
 CREATE TABLE Playlist (
     id INT NOT NULL PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
-    number_of_songs INT NOT NULL
+    number_of_songs INT NOT NULL,
+    userID INT NOT NULL REFERENCES User(id)
 ) AS PlaylistTable;
 
