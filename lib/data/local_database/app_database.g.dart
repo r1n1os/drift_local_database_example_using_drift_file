@@ -287,8 +287,15 @@ class Song extends Table with TableInfo<Song, SongTable> {
       type: DriftSqlType.int,
       requiredDuringInsert: true,
       $customConstraints: 'NOT NULL');
+  static const VerificationMeta _artistIdMeta =
+      const VerificationMeta('artistId');
+  late final GeneratedColumn<int> artistId = GeneratedColumn<int>(
+      'artist_id', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: true,
+      $customConstraints: 'NOT NULL');
   @override
-  List<GeneratedColumn> get $columns => [id, name, duration];
+  List<GeneratedColumn> get $columns => [id, name, duration, artistId];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -314,6 +321,12 @@ class Song extends Table with TableInfo<Song, SongTable> {
     } else if (isInserting) {
       context.missing(_durationMeta);
     }
+    if (data.containsKey('artist_id')) {
+      context.handle(_artistIdMeta,
+          artistId.isAcceptableOrUnknown(data['artist_id']!, _artistIdMeta));
+    } else if (isInserting) {
+      context.missing(_artistIdMeta);
+    }
     return context;
   }
 
@@ -329,6 +342,8 @@ class Song extends Table with TableInfo<Song, SongTable> {
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       duration: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}duration'])!,
+      artistId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}artist_id'])!,
     );
   }
 
@@ -345,14 +360,19 @@ class SongTable extends DataClass implements Insertable<SongTable> {
   final int id;
   final String name;
   final int duration;
+  final int artistId;
   const SongTable(
-      {required this.id, required this.name, required this.duration});
+      {required this.id,
+      required this.name,
+      required this.duration,
+      required this.artistId});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['name'] = Variable<String>(name);
     map['duration'] = Variable<int>(duration);
+    map['artist_id'] = Variable<int>(artistId);
     return map;
   }
 
@@ -361,6 +381,7 @@ class SongTable extends DataClass implements Insertable<SongTable> {
       id: Value(id),
       name: Value(name),
       duration: Value(duration),
+      artistId: Value(artistId),
     );
   }
 
@@ -371,6 +392,7 @@ class SongTable extends DataClass implements Insertable<SongTable> {
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       duration: serializer.fromJson<int>(json['duration']),
+      artistId: serializer.fromJson<int>(json['artist_id']),
     );
   }
   @override
@@ -380,68 +402,83 @@ class SongTable extends DataClass implements Insertable<SongTable> {
       'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String>(name),
       'duration': serializer.toJson<int>(duration),
+      'artist_id': serializer.toJson<int>(artistId),
     };
   }
 
-  SongTable copyWith({int? id, String? name, int? duration}) => SongTable(
+  SongTable copyWith({int? id, String? name, int? duration, int? artistId}) =>
+      SongTable(
         id: id ?? this.id,
         name: name ?? this.name,
         duration: duration ?? this.duration,
+        artistId: artistId ?? this.artistId,
       );
   @override
   String toString() {
     return (StringBuffer('SongTable(')
           ..write('id: $id, ')
           ..write('name: $name, ')
-          ..write('duration: $duration')
+          ..write('duration: $duration, ')
+          ..write('artistId: $artistId')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name, duration);
+  int get hashCode => Object.hash(id, name, duration, artistId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is SongTable &&
           other.id == this.id &&
           other.name == this.name &&
-          other.duration == this.duration);
+          other.duration == this.duration &&
+          other.artistId == this.artistId);
 }
 
 class SongCompanion extends UpdateCompanion<SongTable> {
   final Value<int> id;
   final Value<String> name;
   final Value<int> duration;
+  final Value<int> artistId;
   const SongCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.duration = const Value.absent(),
+    this.artistId = const Value.absent(),
   });
   SongCompanion.insert({
     this.id = const Value.absent(),
     required String name,
     required int duration,
+    required int artistId,
   })  : name = Value(name),
-        duration = Value(duration);
+        duration = Value(duration),
+        artistId = Value(artistId);
   static Insertable<SongTable> custom({
     Expression<int>? id,
     Expression<String>? name,
     Expression<int>? duration,
+    Expression<int>? artistId,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
       if (duration != null) 'duration': duration,
+      if (artistId != null) 'artist_id': artistId,
     });
   }
 
   SongCompanion copyWith(
-      {Value<int>? id, Value<String>? name, Value<int>? duration}) {
+      {Value<int>? id,
+      Value<String>? name,
+      Value<int>? duration,
+      Value<int>? artistId}) {
     return SongCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
       duration: duration ?? this.duration,
+      artistId: artistId ?? this.artistId,
     );
   }
 
@@ -457,6 +494,9 @@ class SongCompanion extends UpdateCompanion<SongTable> {
     if (duration.present) {
       map['duration'] = Variable<int>(duration.value);
     }
+    if (artistId.present) {
+      map['artist_id'] = Variable<int>(artistId.value);
+    }
     return map;
   }
 
@@ -465,7 +505,8 @@ class SongCompanion extends UpdateCompanion<SongTable> {
     return (StringBuffer('SongCompanion(')
           ..write('id: $id, ')
           ..write('name: $name, ')
-          ..write('duration: $duration')
+          ..write('duration: $duration, ')
+          ..write('artistId: $artistId')
           ..write(')'))
         .toString();
   }
@@ -497,9 +538,9 @@ class Artist extends Table with TableInfo<Artist, ArtistTable> {
       $customConstraints: 'NOT NULL');
   static const VerificationMeta _musicStyleMeta =
       const VerificationMeta('musicStyle');
-  late final GeneratedColumn<int> musicStyle = GeneratedColumn<int>(
+  late final GeneratedColumn<String> musicStyle = GeneratedColumn<String>(
       'music_style', aliasedName, false,
-      type: DriftSqlType.int,
+      type: DriftSqlType.string,
       requiredDuringInsert: true,
       $customConstraints: 'NOT NULL');
   @override
@@ -553,7 +594,7 @@ class Artist extends Table with TableInfo<Artist, ArtistTable> {
       age: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}age'])!,
       musicStyle: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}music_style'])!,
+          .read(DriftSqlType.string, data['${effectivePrefix}music_style'])!,
     );
   }
 
@@ -570,7 +611,7 @@ class ArtistTable extends DataClass implements Insertable<ArtistTable> {
   final int id;
   final String name;
   final int age;
-  final int musicStyle;
+  final String musicStyle;
   const ArtistTable(
       {required this.id,
       required this.name,
@@ -582,7 +623,7 @@ class ArtistTable extends DataClass implements Insertable<ArtistTable> {
     map['id'] = Variable<int>(id);
     map['name'] = Variable<String>(name);
     map['age'] = Variable<int>(age);
-    map['music_style'] = Variable<int>(musicStyle);
+    map['music_style'] = Variable<String>(musicStyle);
     return map;
   }
 
@@ -602,7 +643,7 @@ class ArtistTable extends DataClass implements Insertable<ArtistTable> {
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       age: serializer.fromJson<int>(json['age']),
-      musicStyle: serializer.fromJson<int>(json['music_style']),
+      musicStyle: serializer.fromJson<String>(json['music_style']),
     );
   }
   @override
@@ -612,11 +653,11 @@ class ArtistTable extends DataClass implements Insertable<ArtistTable> {
       'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String>(name),
       'age': serializer.toJson<int>(age),
-      'music_style': serializer.toJson<int>(musicStyle),
+      'music_style': serializer.toJson<String>(musicStyle),
     };
   }
 
-  ArtistTable copyWith({int? id, String? name, int? age, int? musicStyle}) =>
+  ArtistTable copyWith({int? id, String? name, int? age, String? musicStyle}) =>
       ArtistTable(
         id: id ?? this.id,
         name: name ?? this.name,
@@ -650,7 +691,7 @@ class ArtistCompanion extends UpdateCompanion<ArtistTable> {
   final Value<int> id;
   final Value<String> name;
   final Value<int> age;
-  final Value<int> musicStyle;
+  final Value<String> musicStyle;
   const ArtistCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
@@ -661,7 +702,7 @@ class ArtistCompanion extends UpdateCompanion<ArtistTable> {
     this.id = const Value.absent(),
     required String name,
     required int age,
-    required int musicStyle,
+    required String musicStyle,
   })  : name = Value(name),
         age = Value(age),
         musicStyle = Value(musicStyle);
@@ -669,7 +710,7 @@ class ArtistCompanion extends UpdateCompanion<ArtistTable> {
     Expression<int>? id,
     Expression<String>? name,
     Expression<int>? age,
-    Expression<int>? musicStyle,
+    Expression<String>? musicStyle,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -683,7 +724,7 @@ class ArtistCompanion extends UpdateCompanion<ArtistTable> {
       {Value<int>? id,
       Value<String>? name,
       Value<int>? age,
-      Value<int>? musicStyle}) {
+      Value<String>? musicStyle}) {
     return ArtistCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
@@ -705,7 +746,7 @@ class ArtistCompanion extends UpdateCompanion<ArtistTable> {
       map['age'] = Variable<int>(age.value);
     }
     if (musicStyle.present) {
-      map['music_style'] = Variable<int>(musicStyle.value);
+      map['music_style'] = Variable<String>(musicStyle.value);
     }
     return map;
   }

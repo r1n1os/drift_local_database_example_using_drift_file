@@ -8,14 +8,15 @@ CREATE TABLE User (
 CREATE TABLE Song (
     id INT NOT NULL PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
-    duration INT NOT NULL
+    duration INT NOT NULL,
+    artist_id INT NOT NULL
 ) AS SongTable;
 
 CREATE TABLE Artist (
     id INT NOT NULL PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     age INT NOT NULL,
-    music_style INT NOT NULL
+    music_style TEXT NOT NULL
 ) AS ArtistTable;
 
 CREATE TABLE Playlist (
