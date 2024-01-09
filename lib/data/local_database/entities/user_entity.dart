@@ -33,7 +33,7 @@ class UserEntity {
     await db.into(db.user).insertOnConflictUpdate(userEntity.toCompanion());
   }
 
-  static Future<void> saveListUserEntity(
+  static Future<void> saveListOfUserEntity(
       List<UserEntity> userEntityList) async {
     await Future.forEach(userEntityList, (userEntity) {
       saveSingleUserEntity(userEntity);
