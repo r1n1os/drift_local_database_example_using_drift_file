@@ -6,23 +6,30 @@ CREATE TABLE User (
 ) As UserTable;
 
 CREATE TABLE Song (
-    id INT NOT NULL PRIMARY KEY AUTOINCREMENT,
+    id INT NOT NULL PRIMARY KEY,
     name TEXT NOT NULL,
     duration INT NOT NULL,
     artist_id INT NOT NULL
 ) AS SongTable;
 
 CREATE TABLE Artist (
-    id INT NOT NULL PRIMARY KEY AUTOINCREMENT,
+    id INT NOT NULL PRIMARY KEY,
     name TEXT NOT NULL,
     age INT NOT NULL,
     music_style TEXT NOT NULL
 ) AS ArtistTable;
 
 CREATE TABLE Playlist (
-    id INT NOT NULL PRIMARY KEY AUTOINCREMENT,
+    id INT NOT NULL PRIMARY KEY,
     name TEXT NOT NULL,
     number_of_songs INT NOT NULL,
     userID INT NOT NULL REFERENCES User(id)
 ) AS PlaylistTable;
+
+CREATE TABLE playlistWithSong (
+    id INT NOT NULL PRIMARY KEY AUTOINCREMENT,
+    song_id INT NOT NULL REFERENCES Song(id),
+    playlist_id INT NOT NULL REFERENCES Playlist(id),
+    CONSTRAINT songIdWithPlaylistID UNIQUE (song_id, playlist_id)
+) AS PlaylistWithSongTable;
 
