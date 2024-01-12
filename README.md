@@ -1,17 +1,18 @@
 # drift_local_database_example
 
-A new Flutter project.
+This is an example project demostrating how you can user Drift local databe into your flutter app.
 
-## Getting Started
+### NOTE: Currently does not have any UI implementation as it is used as an extention/reference to my medium article. I will consider to implement UI as well.
 
-This project is a starting point for a Flutter application.
+## Link to the relevant article: 
 
-A few resources to get you started if this is your first Flutter project:
+## Includes the following:
+* Setup
+* How to implement One to One Relationship
+* How to implement One to Many Relationship
+* How to implement Many to Many Relationship
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## References:
+ * Package page: https://pub.dev/packages/drift
+ * Drift page: https://drift.simonbinder.eu/docs/
 
