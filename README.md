@@ -1,6 +1,6 @@
 # drift_local_database_example
 
-This is an example project demostrating how you can user Drift local databe into your flutter app.
+This is an example project demostrating how you can user Drift local database (using the .drift file) into your flutter app.
 
 ### NOTE: Currently does not have any UI implementation as it is used as an extention/reference to my medium article. I will consider to implement UI as well.
 
