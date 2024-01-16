@@ -27,10 +27,10 @@ class UserEntity {
 
   static Future<void> saveSingleUserEntity(UserEntity userEntity) async {
     AppDatabase db = AppDatabase();
+    await db.into(db.user).insertOnConflictUpdate(userEntity.toCompanion());
     if (userEntity.playlistEntity != null) {
       await PlaylistEntity.saveSinglePlaylistEntity(userEntity.playlistEntity!);
     }
-    await db.into(db.user).insertOnConflictUpdate(userEntity.toCompanion());
   }
 
   static Future<void> saveListOfUserEntity(

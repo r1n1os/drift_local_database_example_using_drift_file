@@ -2,21 +2,6 @@ import 'package:drift/drift.dart';
 import 'package:drift_local_database_example/data/local_database/app_database.dart';
 import 'package:drift_local_database_example/data/local_database/entities/song_entity.dart';
 
-/*
-class ArtistTable extends Table {
-  IntColumn get id => integer()();
-
-  TextColumn? get name => text().nullable()();
-
-  IntColumn? get age => integer().nullable()();
-
-  TextColumn? get musicStyle => text().nullable()();
-
-  @override
-  Set<Column> get primaryKey => {id};
-}
-*/
-
 class ArtistEntity {
   int? id;
   String? name;
@@ -37,10 +22,10 @@ class ArtistEntity {
 
   static Future<void> saveSingleArtistEntity(ArtistEntity artistEntity) async {
     AppDatabase db = AppDatabase();
+    await db.into(db.artist).insertOnConflictUpdate(artistEntity.toCompanion());
     if (artistEntity.songEntityList != null) {
       await SongEntity.saveListOfSongsEntity(artistEntity.songEntityList ?? []);
     }
-    await db.into(db.artist).insertOnConflictUpdate(artistEntity.toCompanion());
   }
 
   static Future<void> saveListOfArtistEntity(

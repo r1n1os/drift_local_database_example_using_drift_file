@@ -32,9 +32,6 @@ class PlaylistEntity {
     await db
         .into(db.playlist)
         .insertOnConflictUpdate(playlistEntity.toCompanion());
-    /**
-     * Beginning of new part
-     * */
     if (playlistEntity.songEntityList != null) {
       await _saveSongAndRelationshipData(
           playlistEntity.songEntityList ?? [], playlistEntity.id ?? -1);
@@ -44,14 +41,12 @@ class PlaylistEntity {
   static Future<void> _saveSongAndRelationshipData(
       List<SongEntity> songEntityList, int playlistId) async {
     await Future.forEach(songEntityList, (songEntity) async {
+      SongEntity.saveSingleSongEntity(songEntity);
       await PlaylistWithSongEntity.saveSinglePlaylistWithSongEntity(
           PlaylistWithSongEntity(
               songId: songEntity.id, playlistId: playlistId));
-      SongEntity.saveSingleSongEntity(songEntity);
     });
   }
-
-  /// Ending of new part
 
   static Future<void> saveListOfPlaylist(
       List<PlaylistEntity> playlistEntityList) async {
