@@ -32,6 +32,7 @@ class PlaylistEntity {
     await db
         .into(db.playlist)
         .insertOnConflictUpdate(playlistEntity.toCompanion());
+    await PlaylistWithSongEntity.cleanRelationshipBasedOnPlaylistId(playlistEntity.id ?? -1);
     if (playlistEntity.songEntityList != null) {
       await _saveSongAndRelationshipData(
           playlistEntity.songEntityList ?? [], playlistEntity.id ?? -1);

@@ -30,6 +30,13 @@ class PlaylistWithSongEntity {
     }
   }
 
+  static Future<void> cleanRelationshipBasedOnPlaylistId(int playlistId) async {
+    AppDatabase db = AppDatabase();
+    await (db.delete(db.playlistWithSong)
+      ..where((tbl) => tbl.playlistId.equals(playlistId)))
+        .go();
+  }
+
   static Future<List<PlaylistWithSongEntity>?> queryListOfPlaylistWithSongByPlaylistId(int playlistId) async {
     AppDatabase db = AppDatabase();
     List<PlaylistWithSongEntity> playlistWithSongEntityList = [];
