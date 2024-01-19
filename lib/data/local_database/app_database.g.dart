@@ -541,8 +541,16 @@ class Artist extends Table with TableInfo<Artist, ArtistTable> {
       type: DriftSqlType.string,
       requiredDuringInsert: true,
       $customConstraints: 'NOT NULL');
+  static const VerificationMeta _isActiveMeta =
+      const VerificationMeta('isActive');
+  late final GeneratedColumn<int> isActive = GeneratedColumn<int>(
+      'isActive', aliasedName, true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      $customConstraints: 'DEFAULT 0',
+      defaultValue: const CustomExpression('0'));
   @override
-  List<GeneratedColumn> get $columns => [id, name, age, musicStyle];
+  List<GeneratedColumn> get $columns => [id, name, age, musicStyle, isActive];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -576,6 +584,10 @@ class Artist extends Table with TableInfo<Artist, ArtistTable> {
     } else if (isInserting) {
       context.missing(_musicStyleMeta);
     }
+    if (data.containsKey('isActive')) {
+      context.handle(_isActiveMeta,
+          isActive.isAcceptableOrUnknown(data['isActive']!, _isActiveMeta));
+    }
     return context;
   }
 
@@ -593,6 +605,8 @@ class Artist extends Table with TableInfo<Artist, ArtistTable> {
           .read(DriftSqlType.int, data['${effectivePrefix}age'])!,
       musicStyle: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}music_style'])!,
+      isActive: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}isActive']),
     );
   }
 
@@ -610,11 +624,13 @@ class ArtistTable extends DataClass implements Insertable<ArtistTable> {
   final String name;
   final int age;
   final String musicStyle;
+  final int? isActive;
   const ArtistTable(
       {required this.id,
       required this.name,
       required this.age,
-      required this.musicStyle});
+      required this.musicStyle,
+      this.isActive});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -622,6 +638,9 @@ class ArtistTable extends DataClass implements Insertable<ArtistTable> {
     map['name'] = Variable<String>(name);
     map['age'] = Variable<int>(age);
     map['music_style'] = Variable<String>(musicStyle);
+    if (!nullToAbsent || isActive != null) {
+      map['isActive'] = Variable<int>(isActive);
+    }
     return map;
   }
 
@@ -631,6 +650,9 @@ class ArtistTable extends DataClass implements Insertable<ArtistTable> {
       name: Value(name),
       age: Value(age),
       musicStyle: Value(musicStyle),
+      isActive: isActive == null && nullToAbsent
+          ? const Value.absent()
+          : Value(isActive),
     );
   }
 
@@ -642,6 +664,7 @@ class ArtistTable extends DataClass implements Insertable<ArtistTable> {
       name: serializer.fromJson<String>(json['name']),
       age: serializer.fromJson<int>(json['age']),
       musicStyle: serializer.fromJson<String>(json['music_style']),
+      isActive: serializer.fromJson<int?>(json['isActive']),
     );
   }
   @override
@@ -652,15 +675,22 @@ class ArtistTable extends DataClass implements Insertable<ArtistTable> {
       'name': serializer.toJson<String>(name),
       'age': serializer.toJson<int>(age),
       'music_style': serializer.toJson<String>(musicStyle),
+      'isActive': serializer.toJson<int?>(isActive),
     };
   }
 
-  ArtistTable copyWith({int? id, String? name, int? age, String? musicStyle}) =>
+  ArtistTable copyWith(
+          {int? id,
+          String? name,
+          int? age,
+          String? musicStyle,
+          Value<int?> isActive = const Value.absent()}) =>
       ArtistTable(
         id: id ?? this.id,
         name: name ?? this.name,
         age: age ?? this.age,
         musicStyle: musicStyle ?? this.musicStyle,
+        isActive: isActive.present ? isActive.value : this.isActive,
       );
   @override
   String toString() {
@@ -668,13 +698,14 @@ class ArtistTable extends DataClass implements Insertable<ArtistTable> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('age: $age, ')
-          ..write('musicStyle: $musicStyle')
+          ..write('musicStyle: $musicStyle, ')
+          ..write('isActive: $isActive')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name, age, musicStyle);
+  int get hashCode => Object.hash(id, name, age, musicStyle, isActive);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -682,7 +713,8 @@ class ArtistTable extends DataClass implements Insertable<ArtistTable> {
           other.id == this.id &&
           other.name == this.name &&
           other.age == this.age &&
-          other.musicStyle == this.musicStyle);
+          other.musicStyle == this.musicStyle &&
+          other.isActive == this.isActive);
 }
 
 class ArtistCompanion extends UpdateCompanion<ArtistTable> {
@@ -690,17 +722,20 @@ class ArtistCompanion extends UpdateCompanion<ArtistTable> {
   final Value<String> name;
   final Value<int> age;
   final Value<String> musicStyle;
+  final Value<int?> isActive;
   const ArtistCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.age = const Value.absent(),
     this.musicStyle = const Value.absent(),
+    this.isActive = const Value.absent(),
   });
   ArtistCompanion.insert({
     this.id = const Value.absent(),
     required String name,
     required int age,
     required String musicStyle,
+    this.isActive = const Value.absent(),
   })  : name = Value(name),
         age = Value(age),
         musicStyle = Value(musicStyle);
@@ -709,12 +744,14 @@ class ArtistCompanion extends UpdateCompanion<ArtistTable> {
     Expression<String>? name,
     Expression<int>? age,
     Expression<String>? musicStyle,
+    Expression<int>? isActive,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
       if (age != null) 'age': age,
       if (musicStyle != null) 'music_style': musicStyle,
+      if (isActive != null) 'isActive': isActive,
     });
   }
 
@@ -722,12 +759,14 @@ class ArtistCompanion extends UpdateCompanion<ArtistTable> {
       {Value<int>? id,
       Value<String>? name,
       Value<int>? age,
-      Value<String>? musicStyle}) {
+      Value<String>? musicStyle,
+      Value<int?>? isActive}) {
     return ArtistCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
       age: age ?? this.age,
       musicStyle: musicStyle ?? this.musicStyle,
+      isActive: isActive ?? this.isActive,
     );
   }
 
@@ -746,6 +785,9 @@ class ArtistCompanion extends UpdateCompanion<ArtistTable> {
     if (musicStyle.present) {
       map['music_style'] = Variable<String>(musicStyle.value);
     }
+    if (isActive.present) {
+      map['isActive'] = Variable<int>(isActive.value);
+    }
     return map;
   }
 
@@ -755,7 +797,8 @@ class ArtistCompanion extends UpdateCompanion<ArtistTable> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('age: $age, ')
-          ..write('musicStyle: $musicStyle')
+          ..write('musicStyle: $musicStyle, ')
+          ..write('isActive: $isActive')
           ..write(')'))
         .toString();
   }
