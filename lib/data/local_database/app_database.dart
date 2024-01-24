@@ -33,7 +33,7 @@ class AppDatabase extends _$AppDatabase {
       ///In this method is where we are handling our migration
       onUpgrade: (Migrator m, int from, int to) async {
         if (from < 2) {
-          //await m.addColumn(artist, artist.isActive);
+          await m.addColumn(artist, artist.isActive);
           ///The code line below is when you need to migrate newly added table
           //await m.create(newTable);
         }

@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:drift_local_database_example/data/local_database/app_database.dart';
-import 'package:drift_local_database_example/data/local_database/entities/song_entity.dart';
 import 'package:drift_local_database_example/data/local_database/entities/playlist_with_song_entity.dart';
+import 'package:drift_local_database_example/data/local_database/entities/song_entity.dart';
 
 class PlaylistEntity {
   int? id;
@@ -22,7 +22,7 @@ class PlaylistEntity {
     name = json['name'];
     numberOfSongs = json['number_of_songs'];
     userId = json['user_id'];
-    if(json['songs'] != null){
+    if (json['songs'] != null) {
       songEntityList = SongEntity.fromJsonArray(json['songs']);
     }
   }
@@ -46,7 +46,8 @@ class PlaylistEntity {
     await db
         .into(db.playlist)
         .insertOnConflictUpdate(playlistEntity.toCompanion());
-    await PlaylistWithSongEntity.cleanRelationshipBasedOnPlaylistId(playlistEntity.id ?? -1);
+    await PlaylistWithSongEntity.cleanRelationshipBasedOnPlaylistId(
+        playlistEntity.id ?? -1);
     if (playlistEntity.songEntityList != null) {
       await _saveSongAndRelationshipData(
           playlistEntity.songEntityList ?? [], playlistEntity.id ?? -1);
@@ -75,7 +76,8 @@ class PlaylistEntity {
     if (playlistTable != null) {
       List<PlaylistWithSongEntity>? playlistWithSongEntityList =
           await _queryToGetPlaylistWithSongEntityList(playlistTable.id ?? -1);
-      List<SongEntity> queriedSongEntityList = await _queryToGetSongEntityList(playlistWithSongEntityList);
+      List<SongEntity> queriedSongEntityList =
+          await _queryToGetSongEntityList(playlistWithSongEntityList);
       return PlaylistEntity(
           id: playlistTable.id,
           name: playlistTable.name,
@@ -93,18 +95,19 @@ class PlaylistEntity {
         playlistId);
   }
 
-  static Future<List<SongEntity>> _queryToGetSongEntityList(List<PlaylistWithSongEntity>? playlistWithSongEntityList) async {
-     List<SongEntity> queriedSongEntityList = [];
-     if(playlistWithSongEntityList != null) {
-       await Future.forEach(playlistWithSongEntityList,
-              (playlistWithSongEntity) async {
-            SongEntity? tempSongEntity = await SongEntity.querySongById(
-                playlistWithSongEntity.songId ?? -1);
-            if (tempSongEntity != null) {
-              queriedSongEntityList.add(tempSongEntity);
-            }
-          });
-     }
+  static Future<List<SongEntity>> _queryToGetSongEntityList(
+      List<PlaylistWithSongEntity>? playlistWithSongEntityList) async {
+    List<SongEntity> queriedSongEntityList = [];
+    if (playlistWithSongEntityList != null) {
+      await Future.forEach(playlistWithSongEntityList,
+          (playlistWithSongEntity) async {
+        SongEntity? tempSongEntity =
+            await SongEntity.querySongById(playlistWithSongEntity.songId ?? -1);
+        if (tempSongEntity != null) {
+          queriedSongEntityList.add(tempSongEntity);
+        }
+      });
+    }
     return queriedSongEntityList;
   }
 
