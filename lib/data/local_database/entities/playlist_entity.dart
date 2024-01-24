@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:drift_local_database_example/data/local_database/app_database.dart';
 import 'package:drift_local_database_example/data/local_database/entities/song_entity.dart';
-import 'package:drift_local_database_example/data/local_database/entities/song_with_playlist_entity.dart';
+import 'package:drift_local_database_example/data/local_database/entities/playlist_with_song_entity.dart';
 
 class PlaylistEntity {
   int? id;
@@ -17,6 +17,20 @@ class PlaylistEntity {
       this.userId,
       this.songEntityList});
 
+  PlaylistEntity.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    name = json['name'];
+    numberOfSongs = json['number_of_songs'];
+    userId = json['user_id'];
+    if(json['songs'] != null){
+      songEntityList = SongEntity.fromJsonArray(json['songs']);
+    }
+  }
+
+  static Future<List<PlaylistEntity>> fromJsonArray(List jsonArray) async {
+    return jsonArray.map((value) => PlaylistEntity.fromJson(value)).toList();
+  }
+
   PlaylistCompanion toCompanion() {
     return PlaylistCompanion(
       id: Value(id ?? -1),
@@ -28,7 +42,7 @@ class PlaylistEntity {
 
   static Future<void> saveSinglePlaylistEntity(
       PlaylistEntity playlistEntity) async {
-    AppDatabase db = AppDatabase();
+    AppDatabase db = AppDatabase.instance();
     await db
         .into(db.playlist)
         .insertOnConflictUpdate(playlistEntity.toCompanion());
@@ -62,16 +76,6 @@ class PlaylistEntity {
       List<PlaylistWithSongEntity>? playlistWithSongEntityList =
           await _queryToGetPlaylistWithSongEntityList(playlistTable.id ?? -1);
       List<SongEntity> queriedSongEntityList = await _queryToGetSongEntityList(playlistWithSongEntityList);
-      if (playlistWithSongEntityList != null) {
-        await Future.forEach(playlistWithSongEntityList,
-            (playlistWithSongEntity) async {
-          SongEntity? tempSongEntity = await SongEntity.querySongById(
-              playlistWithSongEntity.songId ?? -1);
-          if (tempSongEntity != null) {
-            queriedSongEntityList.add(tempSongEntity);
-          }
-        });
-      }
       return PlaylistEntity(
           id: playlistTable.id,
           name: playlistTable.name,
@@ -105,7 +109,7 @@ class PlaylistEntity {
   }
 
   static Future<List<PlaylistEntity>> queryAllPlaylists() async {
-    AppDatabase db = AppDatabase();
+    AppDatabase db = AppDatabase.instance();
     List<PlaylistEntity> playlistEntityList = [];
     List<PlaylistTable> playlistTableList = await db.select(db.playlist).get();
     await Future.forEach(playlistTableList, (playlistTable) async {
@@ -119,7 +123,7 @@ class PlaylistEntity {
   }
 
   static Future<PlaylistEntity?> queryPlaylistById(int playlistId) async {
-    AppDatabase db = AppDatabase();
+    AppDatabase db = AppDatabase.instance();
     PlaylistTable? playlistTable = await (db.select(db.playlist)
           ..where((tbl) => tbl.id.equals(playlistId)))
         .getSingleOrNull();
@@ -127,7 +131,7 @@ class PlaylistEntity {
   }
 
   static Future<PlaylistEntity?> queryPlaylistByUserId(int userId) async {
-    AppDatabase db = AppDatabase();
+    AppDatabase db = AppDatabase.instance();
     PlaylistTable? playlistTable = await (db.select(db.playlist)
           ..where((tbl) => tbl.userID.equals(userId)))
         .getSingleOrNull();

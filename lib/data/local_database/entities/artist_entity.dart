@@ -12,6 +12,20 @@ class ArtistEntity {
   ArtistEntity(
       {this.id, this.name, this.age, this.musicStyle, this.songEntityList});
 
+  ArtistEntity.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    name = json['name'];
+    age = json['age'];
+    musicStyle = json['music_style'];
+    if (json['songs'] != null) {
+      songEntityList = SongEntity.fromJsonArray(json['songs']);
+    }
+  }
+
+  static Future<List<ArtistEntity>> fromJsonArray(List jsonArray) async {
+    return jsonArray.map((value) => ArtistEntity.fromJson(value)).toList();
+  }
+
   ArtistCompanion toCompanion() {
     return ArtistCompanion(
         id: Value(id ?? -1),
@@ -21,7 +35,7 @@ class ArtistEntity {
   }
 
   static Future<void> saveSingleArtistEntity(ArtistEntity artistEntity) async {
-    AppDatabase db = AppDatabase();
+    AppDatabase db = AppDatabase.instance();
     await db.into(db.artist).insertOnConflictUpdate(artistEntity.toCompanion());
     if (artistEntity.songEntityList != null) {
       await SongEntity.saveListOfSongsEntity(artistEntity.songEntityList ?? []);
@@ -30,8 +44,8 @@ class ArtistEntity {
 
   static Future<void> saveListOfArtistEntity(
       List<ArtistEntity> artistEntityList) async {
-    await Future.forEach(artistEntityList, (artistEntity) {
-      saveSingleArtistEntity(artistEntity);
+    await Future.forEach(artistEntityList, (artistEntity) async {
+      await saveSingleArtistEntity(artistEntity);
     });
   }
 
@@ -52,7 +66,7 @@ class ArtistEntity {
   }
 
   static Future<List<ArtistEntity>> queryAllArtists() async {
-    AppDatabase db = AppDatabase();
+    AppDatabase db = AppDatabase.instance();
     List<ArtistEntity> artistEntityList = [];
     List<ArtistTable> artistTableList = await db.select(db.artist).get();
     await Future.forEach(artistTableList, (artistTable) async {
@@ -65,7 +79,7 @@ class ArtistEntity {
   }
 
   static Future<ArtistEntity?> queryArtistById(int artistId) async {
-    AppDatabase db = AppDatabase();
+    AppDatabase db = AppDatabase.instance();
     ArtistTable? artistTable = await (db.select(db.artist)
           ..where((tbl) => tbl.id.equals(artistId)))
         .getSingleOrNull();

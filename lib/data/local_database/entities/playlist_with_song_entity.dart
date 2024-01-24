@@ -15,7 +15,7 @@ class PlaylistWithSongEntity {
   }
 
   static Future<void> saveSinglePlaylistWithSongEntity(PlaylistWithSongEntity playlistWithSongEntity) async {
-    AppDatabase db = AppDatabase();
+    AppDatabase db = AppDatabase.instance();
     await db.into(db.playlistWithSong).insertOnConflictUpdate(playlistWithSongEntity.toCompanion());
   }
 
@@ -31,14 +31,14 @@ class PlaylistWithSongEntity {
   }
 
   static Future<void> cleanRelationshipBasedOnPlaylistId(int playlistId) async {
-    AppDatabase db = AppDatabase();
+    AppDatabase db = AppDatabase.instance();
     await (db.delete(db.playlistWithSong)
       ..where((tbl) => tbl.playlistId.equals(playlistId)))
         .go();
   }
 
   static Future<List<PlaylistWithSongEntity>?> queryListOfPlaylistWithSongByPlaylistId(int playlistId) async {
-    AppDatabase db = AppDatabase();
+    AppDatabase db = AppDatabase.instance();
     List<PlaylistWithSongEntity> playlistWithSongEntityList = [];
     List<PlaylistWithSongTable>? playlistWithSongTableList = await (db.select(db.playlistWithSong)
       ..where((tbl) => tbl.playlistId.equals(playlistId)))

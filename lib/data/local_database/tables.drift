@@ -16,8 +16,7 @@ CREATE TABLE Artist (
     id INT NOT NULL PRIMARY KEY,
     name TEXT NOT NULL,
     age INT NOT NULL,
-    music_style TEXT NOT NULL,
-    isActive INTEGER Default 0
+    music_style TEXT NOT NULL
 ) AS ArtistTable;
 
 CREATE TABLE Playlist (
