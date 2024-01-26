@@ -4,7 +4,11 @@ This is an example project demostrating how you can user Drift local database (u
 
 ### NOTE: Currently does not have any UI implementation as it is used as an extention/reference to my medium article. I will consider to implement UI as well.
 
-## Link to the relevant article: 
+## Links to the relevant articles: 
+* Intro Setup And Migration: https://r1n1os.medium.com/drift-local-database-for-flutter-part-1-intro-setup-and-migration-09a64d44f6df
+* One to One Relationship: https://r1n1os.medium.com/drift-local-database-for-flutter-part-2-one-to-one-relationship-a3a921a53e55
+* One to Many Relationship https://r1n1os.medium.com/drift-local-database-for-flutter-part-3-one-to-many-relationship-43f24fcc474d
+* Many to Many Relationship https://r1n1os.medium.com/drift-local-database-for-flutter-part-4-many-to-many-relationship-9775b81453d2 
 
 ## Includes the following:
 * Setup
